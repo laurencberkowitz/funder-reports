@@ -190,12 +190,13 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:v
 <section id="refine" role="tabpanel" hidden>
   <h2>Refine this request</h2>
   <p>This report was produced from a single-sentence request, so several parameters were set without your input. Each field below shows the parameter, what this report assumed, and a box for your answer.</p>
-  <p><b>How to respond:</b> type your answer in the box under any field, select "Copy my answers," and paste them into an email to <span class="addr">lauren@laurenberkowitz.co</span>. The same form is enclosed as a Word file if you prefer to answer there.</p>
+  <p><b>How to respond:</b> type your answer in the box under any field, then select "Send my answers." Your answers go directly to <span class="addr">lauren@laurenberkowitz.co</span>. The same form is enclosed as a Word file if you prefer to answer there.</p>
   <p class="note">Every field is optional. A field left blank keeps the assumption shown. Each answer narrows the search and changes the ranking in the next version.</p>
   <form id="refineForm" novalidate>
     <div id="formFields"></div>
     <div class="actions">
-      <button type="submit" class="btn">Copy my answers</button>
+      <button type="submit" class="btn" id="sendBtn">Send my answers</button>
+      <button type="button" class="btn" id="copyBtn" style="background:none;color:var(--accent);border:1px solid var(--accent)">Copy my answers instead</button>
       <span id="copyStatus" aria-live="polite"></span>
     </div>
     <div id="fallbackWrap" hidden>
@@ -271,16 +272,29 @@ FORM.forEach(q => {
     ${q.desc?`<div class="fd">${esc(q.desc)}</div>`:""}<div class="fa"><b>${esc(q.alabel)}</b> ${esc(q.assumed)}</div>
     <div class="fa" style="margin:8px 0 4px"><b>Your answer:</b>${q.hint?` <span class="fd">${esc(q.hint)}</span>`:""}</div><textarea id="q_${q.id}" aria-label="Your answer to ${esc(q.title)}"></textarea></div>`);
 });
-document.getElementById("refineForm").addEventListener("submit", async e => {
+const FORMSPREE = "https://formspree.io/f/xjygvqkb";
+function collect(){
+  const lines=["Refine this request: answers from Minh Than",""]; const data={}; let n=0;
+  FORM.forEach(q=>{const v=document.getElementById("q_"+q.id).value.trim(); if(v){n++; data[`${q.id}. ${q.title}`]=v; lines.push(`${q.id}. ${q.title}`,`Assumed: ${q.assumed}`,`Answer: ${v}`,"");}});
+  return {n,text:lines.join("\n"),data};
+}
+const statusEl=document.getElementById("copyStatus");
+async function copyAnswers(c){
+  try{await navigator.clipboard.writeText(c.text); statusEl.textContent=`${c.n} answer${c.n>1?"s":""} copied. Paste into an email to lauren@laurenberkowitz.co.`; document.getElementById("fallbackWrap").hidden=true;}
+  catch(err){const fb=document.getElementById("fallback"); fb.value=c.text; document.getElementById("fallbackWrap").hidden=false; fb.focus(); fb.select(); statusEl.textContent="Select the text below and copy it.";}
+}
+document.getElementById("copyBtn").addEventListener("click",()=>{const c=collect(); if(!c.n){statusEl.textContent="No answers entered yet."; return;} copyAnswers(c);});
+document.getElementById("refineForm").addEventListener("submit", async e=>{
   e.preventDefault();
-  const lines = ["Refine this request: answers from Minh Than", ""];
-  let n = 0;
-  FORM.forEach(q => { const v = document.getElementById("q_"+q.id).value.trim(); if(v){ n++; lines.push(`${q.id}. ${q.title}`, `Assumed: ${q.assumed}`, `Answer: ${v}`, ""); } });
-  const status = document.getElementById("copyStatus");
-  if(!n){ status.textContent = "No answers entered yet."; return; }
-  const text = lines.join("\n");
-  try { await navigator.clipboard.writeText(text); status.textContent = `${n} answer${n>1?"s":""} copied. Paste into an email to lauren@laurenberkowitz.co.`; document.getElementById("fallbackWrap").hidden = true; }
-  catch(err){ const fb=document.getElementById("fallback"); fb.value=text; document.getElementById("fallbackWrap").hidden=false; fb.focus(); fb.select(); status.textContent = "Select the text below and copy it."; }
+  const c=collect(); if(!c.n){statusEl.textContent="No answers entered yet."; return;}
+  const btn=document.getElementById("sendBtn"); btn.disabled=true; statusEl.textContent="Sending...";
+  try{
+    const r=await fetch(FORMSPREE,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({_subject:"Refine this request: answers from Minh Than",message:c.text,...c.data})});
+    if(!r.ok) throw new Error(r.status);
+    statusEl.textContent=`Sent. ${c.n} answer${c.n>1?"s":""} delivered to lauren@laurenberkowitz.co. Thank you.`;
+  }catch(err){
+    btn.disabled=false; statusEl.textContent="Sending did not go through. Use \"Copy my answers instead\" and paste them into an email to lauren@laurenberkowitz.co.";
+  }
 });
 </script>
 </body></html>
