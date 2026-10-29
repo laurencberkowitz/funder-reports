@@ -139,7 +139,7 @@ textarea:focus-visible,.search:focus-within{outline:2px solid var(--teal);outlin
 <div class="center" id="center">
   <div class="bar">
     <label class="search" for="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5b6a66" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search funders, programs, deadlines"></label>
-    <span class="eyebrow" style="color:var(--muted)">Research as of 5 Oct 2026 · v1.6</span>
+    <span class="eyebrow" style="color:var(--muted)">Research as of 5 Oct 2026, deadlines and summary claims rechecked 29 Oct 2026 · v1.7</span>
   </div>
   <main class="read" id="read"></main>
 </div>
@@ -197,7 +197,7 @@ function overview(){
   <h2 style="margin-top:30px">Summary</h2>
   <div class="prose"><p>The funders with documented interest in preventing cancer with small molecule drugs or vaccines that fit Dr. Than's pancreatic interception work most closely are ${fl("G1","the National Cancer Institute")} (investigator-initiated grants, and the in-kind ${fl("G2","PREVENT program")}, next deadline 2 November 2026), ${fl(findId("Basser"),"the Basser Center for BRCA")}, ${fl(findId("Lustgarten"),"the Lustgarten Foundation")}, and ${fl(findId("Revolution"),"Revolution Medicines")}, the company whose RAS inhibitors Dr. Than tested.</p>
   <p>Among individual and family donors, the closest fit open to an investigator outside the recipient institution is the ${fl("F1","Stephenson family's pancreatic cancer grants and prize at City of Hope")}. ${fl("F3","Project Purple")} funds KRAS research and drug prevention of precursor lesions, and ${fl("F2","Sky Foundation")} lists Ben Stanger among the researchers it has funded.</p>
-  <p>No company is running a clinical interception trial with a RAS inhibitor. Johns Hopkins investigators reported this in July 2026; Dr. Than's preclinical data, a median survival above one year against under five months in untreated controls, is the evidence a sponsor would weigh.</p></div>
+  <p>No company is running a clinical interception trial with a RAS inhibitor; every registered RAS inhibitor trial in pancreatic cancer, including the adjuvant daraxonrasib trial in resected patients (NCT07252232), requires an existing cancer diagnosis (checked 29 October 2026). The only planned human RAS inhibitor interception trial is Penn's own, described by Dr. Vonderheide in March 2026 as in early planning with drug supply unresolved. The one human interception trial that has read out in high-risk people is the Johns Hopkins mutant KRAS vaccine (NCT05013216, July 2026), funded by NCI, Lustgarten and Stand Up To Cancer with no company sponsor. Dr. Than's preclinical data, a median survival above one year against under five months in untreated controls, is the evidence a sponsor would weigh.</p></div>
   <h3>Highest-ranked funders</h3>
   <div class="tablewrap"><table><thead><tr><th>Funder</th><th>Type</th><th>Tier</th><th>Relationship</th></tr></thead><tbody>
   ${top.map(f=>`<tr><td>${fl(f.funder_id)}</td><td>${esc(f.list)}</td><td>${esc(f.tier)}</td><td><span class="chip ${STAT[f.status][1]}">${STAT[f.status][0]}</span></td></tr>`).join("")}
